@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html><head>
+            <meta charset="UTF-8">
+            <title>COMP 3010 Assignment 3 - Oral Messaging</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+<style>
+.vscode-dark pre {
+background-color: #000000cc !important;
+border-radius: 3px;
+padding: 3px;
+}
+
+pre>code {
+margin: 5px;
+display: block;
+color: white;
+}
+
+.hljs-punctuation {
+color: #d29922;
+}
+
+table {
+  border: 1px black;
+}
+</style>
+        
+        </head><body class="vscode-body vscode-dark"><h1 id="comp-3010-assignment-3---oral-messaging">COMP 3010 Assignment 3 - Oral Messaging</h1>
+<p><strong>Author: Zach Havens, Kristina Zapp</strong></p>
+<p><strong>Date: Fall 2025</strong></p>
+<p><strong><em>Due: December 5th, 4:30pm</em></strong></p>
+<p style="color: red;">**STATUS: DRAFT - This is currently under review and is subject to (minor) changes.**</p>
+<ul>
+<li>Remember to complete the Honesty Declaration in UMLearn</li>
+<li>As a reminder, copying material (text or code) is plagiarism and academic dishonesty (see the Science links in the ROASS page for details on what constitutes academic dishonesty in written/research work). Make it clear where your program can run in your <code>README.md</code>. Include a <code>makefile</code> if compilation is required.</li>
+<li>You may use any programming language that is supported in the aviary lab.</li>
+</ul>
+<h2 id="peer-to-peer---distributed-consensus-system">Peer to Peer - Distributed Consensus System</h2>
+<p>In this assignment, you will create a node for a peer-to-peer consensus system implementing a distributed database of words, using the <a href="https://lamport.azurewebsites.net/pubs/byz.pdf">Oral Message solution to consensus</a>. For this assignment, we will use the push model described (and acted out) in class.</p>
+<p>In order to initially connect to your peers, your not will present itself using gossiping: sending a <code>GOSSIP</code> message to two of a set of well known peers. This will get propagated across the network, with new peers reaching out to your node to establish a mesh network. After joining the network, your node will continue use gossiping as a heartbeating mechanism to notify the other peers that it is still active.</p>
+<h2 id="the-om-peer-to-peer-protocol">The OM Peer-to-Peer Protocol</h2>
+<p>The protocol has three main components, the message format and transport protocol, the gossiping method, and the consensus algorithm.</p>
+<h3 id="messages-and-transport">Messages and Transport</h3>
+<p>Peers will communicate with each other via UDP messages. Message will be JSON formatted and text encoded. Unlike TCP messages, UDP message cannot be partially read from the socket by a call to <code>read()</code>, they will always either be there in full, or not. To simplify things a bit, you can assume that all peer messages will be less that 4096 bytes in length.</p>
+<h3 id="gossiping">Gossiping</h3>
+<p>Your node will announce a <code>GOSSIP</code> message to a peer in the mesh network to enter, and will continue to do so to stay active in the network. Upon receiving a <code>GOSSIP</code> message, your node must forward it (unmodified) to up to 5 randomly chosen known peers to continue along the mesh. In order to ensure that the same messages aren't forwarded around the peer group forever, each <code>GOSSIP</code> message has an <code>id</code> field containing a unique string. Keep track of recent gossips you've received, and ignore them if you receive them again!</p>
+<p><strong>Other Notes</strong></p>
+<ul>
+<li>If you receive a <code>GOSSIP</code> from a peer previously unknown to you, <strong>reply</strong> to them with a <code>GOSSIP_REPLY</code>.</li>
+<li>Anytime you receive <em>either</em> a <code>GOSSIP</code> or a <code>GOSSIP_REPLY</code> from an unknown peer, make sure to <strong>add them</strong> to a list of known peers!</li>
+<li><code>GOSSIP</code> to up to 5 random known peers <strong>every minute</strong> as a heartbeat. *** Drop any nodes** from your list of peers that have not sent a <code>GOSSIP</code> or <code>GOSSIP_REPLY</code> for 2 minutes.</li>
+<li><strong>NEW:</strong> the <code>cliPort</code> and <code>webPort</code> fields are <em>optional</em>, but <strong>strongly encouraged</strong>. If you are using a CLI interface, this will make it easier for the graders to mark your assignment (which is always good.) If you are using a web interface, the well-known peers will add links to your status page in their own, so other students can take a look at what you've put together!</li>
+</ul>
+<h4 id="gossip-message-format"><code>GOSSIP</code> Message Format</h4>
+<pre><code class="language-javascript">{
+  <span class="hljs-string">"command"</span>: <span class="hljs-string">"GOSSIP"</span>,
+  <span class="hljs-string">"host"</span>: <span class="hljs-string">"130.179.28.51"</span>,
+  <span class="hljs-string">"port"</span>: <span class="hljs-number">16000</span>,
+  <span class="hljs-string">"name"</span>: <span class="hljs-string">"Me!"</span>,
+  <span class="hljs-string">"id"</span>: <span class="hljs-string">"90062caa-2bb9-4ba5-bc3d-d8bd627986d6"</span>
+  <span class="hljs-string">"cliPort"</span>: <span class="hljs-number">16000</span>,      
+  <span class="hljs-string">"webPort"</span>: <span class="hljs-number">18080</span>
+}
+</code></pre>
+<h4 id="gossip_reply-message-format"><code>GOSSIP_REPLY</code> Message Format</h4>
+<pre><code class="language-javascript">{
+  <span class="hljs-string">"command"</span>: <span class="hljs-string">"GOSSIP_REPLY"</span>,
+  <span class="hljs-string">"host"</span>: <span class="hljs-string">"130.179.28.113"</span>,
+  <span class="hljs-string">"port"</span>: <span class="hljs-number">16000</span>,
+  <span class="hljs-string">"name"</span>: <span class="hljs-string">"Name of replying peer!"</span>,
+  <span class="hljs-string">"cliPort"</span>: <span class="hljs-number">16000</span>,      
+  <span class="hljs-string">"webPort"</span>: <span class="hljs-number">18080</span>
+}
+</code></pre>
+<h3 id="consensus">Consensus</h3>
+<p>Once your node has gossiped and joined the peer network, you are able to begin taking part in consensuses! The goal of this is to simulate a <em>distributed database</em>. In the real world this could be any sort of data that a system needs to keep consensus over. (Key-value pairs anyone?) In our case, each peer will keep track of <em>a simple list/array of 5 words</em> as their database. Consensus will be used to propose and agree on new values for each of the 5 indexes in this database.</p>
+<p>As mentioned previously, you'll be implementing the Oral Message protocol. To keep it straightforward, we're going to use the same "push" model that we demonstrated in class. In the original paper, the recursive algorithm is described from the base case up. While that's great for proving correctness, it's not how you'll actually need to implement it, so here's a <em>top down</em> overview of how the algorithm works, again, just like we did in class:</p>
+<h4 id="initiating-a-consensus">Initiating a Consensus</h4>
+<p>When a consensus is first started, the root of a consensus tree, the initiator (commander/general) should calculate the maximum level of fault-tolerance <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex" data-d2l-attr-encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> that can be achieved given the peers they are aware of. An <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mi>M</mi><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex" data-d2l-attr-encoding="application/x-tex">OM(m)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mord mathnormal" style="margin-right: 0.10903em;">OM</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span> consensus message is created with the following:</p>
+<ul>
+<li>The fault-tolerance level <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex" data-d2l-attr-encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span></li>
+<li>A proposed database index and value, a</li>
+<li>A list of <em>all</em> peers that should take part in the consensus</li>
+<li>A unique ID for the consensus round</li>
+<li>An empty/null "parent" field to indicate that this is root consensus</li>
+</ul>
+<p>This message should be sent to all the peers in the list.</p>
+<p><em>Note:</em> At this point, the initiator can simply commit the new value to their database! Remember that <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mi>M</mi><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex" data-d2l-attr-encoding="application/x-tex">OM(m)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 1em; vertical-align: -0.25em;"></span><span class="mord mathnormal" style="margin-right: 0.10903em;">OM</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span> <em>assumes that there are <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex" data-d2l-attr-encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> faults/liars at most</em>. If there are more faults, we wouldn't achieve consensus anyways, so the proposer can choose to believe whatever they like!</p>
+<h4 id="receiving-a-consensus-message">Receiving a Consensus Message</h4>
+<p>Receiving a consensus message means that someone has initiated a new consensus with the peer. If the consensus has a parent, it is a sub-consensus. Otherwise, it is the root consensus.</p>
+<p><strong>If <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex" data-d2l-attr-encoding="application/x-tex">m &gt; 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.5782em; vertical-align: -0.0391em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right: 0.2778em;"></span></span><span class="base"><span class="strut" style="height: 0.6444em;"></span><span class="mord">0</span></span></span></span>...</strong></p>
+<p>...then this is a message the peer can't totally trust and needs to validate! In order to do so, the peer need to run a sub-consensus with the other peers to make sure that the initiator isn't lying to them all. This looks similar to initiating a root consensus, but with the following changes:</p>
+<ul>
+<li>The new fault tolerance level is <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex" data-d2l-attr-encoding="application/x-tex">m-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6667em; vertical-align: -0.0833em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right: 0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right: 0.2222em;"></span></span><span class="base"><span class="strut" style="height: 0.6444em;"></span><span class="mord">1</span></span></span></span></li>
+<li>The list of peers is the same as the parent <em>with the new initiator removes</em></li>
+<li>The "parent" field should be set to the ID of the consensus that triggered the sub-consensus</li>
+</ul>
+<p>This new sub-consensus message should then be sent to all the relevant peers to kick it off.</p>
+<p><strong>If <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex" data-d2l-attr-encoding="application/x-tex">m = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.4306em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right: 0.2778em;"></span></span><span class="base"><span class="strut" style="height: 0.6444em;"></span><span class="mord">0</span></span></span></span>...</strong></p>
+<p>...then this is is a "leaf" consensus and doesn't justify further validation. (The consensus can't handle more faults, so no point in sending more messages.) In this case, <em>the recipient can assume that this is the honest value that the sender received from the initiator of the <strong>parent</strong> consensus</em>, and can record it as such. At this point, the recipient heck to see if the parent consensus is "complete", and if so determine what the majority of the peers heard from the initiator and determine what to do with that value:</p>
+<ul>
+<li>If the parent consensus has a parent of its own, then recursively record the result of the newly completed sub-consensus up the tree</li>
+<li>If the parent consensus is the root (ie. has no parent of its own), then the peers have all achieved full consensus!</li>
+</ul>
+<h4 id="consensus-message-format">Consensus Message Format</h4>
+<pre><code class="language-javascript">{ 
+  <span class="hljs-string">"command"</span>: <span class="hljs-string">"CONSENSUS"</span>,
+  <span class="hljs-string">"id"</span>: <span class="hljs-string">'uuid-111'</span>,
+  <span class="hljs-string">"omlevel"</span>: <span class="hljs-number">3</span>,
+  <span class="hljs-string">"initiator"</span>: <span class="hljs-string">"hawk.cs.umantioba.ca:8111"</span>,
+  <span class="hljs-string">"peers"</span>: [<span class="hljs-string">"nuthatch.cs.umanitoba.ca:8111"</span>, ...],
+  <span class="hljs-string">"index"</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-string">"value"</span>: <span class="hljs-string">"aFancyWord"</span>,
+  <span class="hljs-string">"parentid"</span>: <span class="hljs-string">"uuid-0001"</span>
+}
+</code></pre>
+<p>When your peer starts an initial/root consensus (via the <code>consenus</code> CLI command or from your web interface, see below), calculate the <strong>maximum</strong> OM level you could use, given the current number of peers, and use that as your OM level. The <code>peers</code> list should include all peers in the consensus/sub-consensus, including the peer you are sending the command to. If you are creating a sub-consensus, choose a new unique string ID.</p>
+<h4 id="notes-on-consensus">Notes on Consensus</h4>
+<ul>
+<li>Consider ways in which a consensus could fail. What are appropriate ways of handling each of those?</li>
+<li>There is no need to reply to an initiator of a consensus when you have achieved a result for it</li>
+</ul>
+<h2 id="monitoringcontrolling-your-node">Monitoring/Controlling Your Node</h2>
+<p>Your node should be able to be interacted with in one of two ways in order to get information about its state and to modify its behaviour: a TCP-oriented CLI, or a webserver interface.</p>
+<h3 id="tcp-cli">TCP CLI</h3>
+<p>For this option, you can write a small Python program or use <code>telnet</code> as the CLI for interaction.</p>
+<p>Your CLI must accept the following commands:</p>
+<ul>
+<li><code>peers</code> - list all known peers, with last words received from each.</li>
+<li><code>current</code> - the current word list.</li>
+<li><code>consensus # &lt;text&gt;</code> - where <code>#</code> is a numeric index. Run a consensus to set the database entry at the given index to the given word.</li>
+<li><code>lie</code> - begin lying. Lie either all the time, or a set percentage of the time.
+<ul>
+<li>You may want to provide the word, choose a random word, or always choose the same incorrect word to lie with.</li>
+</ul>
+</li>
+<li><code>truth</code> - stop lying. Always return 'honest' answers.</li>
+<li><code>exit</code> - close the command-line interface.</li>
+</ul>
+<h3 id="webapp-interface">Webapp Interface</h3>
+<p>It must support displaying the same data and doing the same tasks as described for the CLI above (lie/set/do consensus).</p>
+<p><strong>Note:</strong> You <em>may</em> use code posted in UM Learn and/or from your A2 work to build this webapp. If you do, please make a note in your <code>README</code>.</p>
+<h2 id="well-known-peers">Well-Known Peers</h2>
+<p>In order to get the peer network started, I will host a set of well-known peers that expose both CLI and web interfaces, and are on the network at the following addresses:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Hostname</th>
+<th>Peer Port (UDP)</th>
+<th>CLI Port (TCP)</th>
+<th style="text-align: left;">Web Port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>hawk.cs.umanitoba.ca</code></td>
+<td>10000</td>
+<td>10000</td>
+<td style="text-align: left;"><a href="http://hawk.cs.umanitoba.ca:10001">10001</a></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>falcon.cs.umanitoba.ca</code></td>
+<td>10000</td>
+<td>10000</td>
+<td style="text-align: left;"><a href="http://falcon.cs.umanitoba.ca:10001">10001</a></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>cormorant.cs.umanitoba.ca</code></td>
+<td>10000</td>
+<td>10000</td>
+<td style="text-align: left;"><a href="http://cormorant.cs.umanitoba.ca:10001">10001</a></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>nuthatch.cs.umanitoba.ca</code></td>
+<td>10000</td>
+<td>10000</td>
+<td style="text-align: left;"><a href="http://nuthatch.cs.umanitoba.ca:10001">10001</a></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><em>Note: There is currently no overview status dashboard, though I may get one up and running eventually.</em></p>
+</blockquote>
+<p><strong>Very Important Note:</strong> As soon as you begin gossiping with the well-known peers, you will become part of the mesh network. <em>Your co-students will be running some of the peers.</em> These peers are likely to return malformed messages, or not return a message at all. You must handle these cases, and not crash. Follow the algorithm's resolutions for those problems.</p>
+<h2 id="summary-of-requirements">Summary of Requirements</h2>
+<p>Your node must be able to:</p>
+<ul>
+<li>Announce itself via messaging all the well-known peers with a <code>GOSSIP</code> message</li>
+<li>Maintain a database of 5 values</li>
+<li>Start a peer with a 'random' (Operating system assigned) port</li>
+<li>Discover peer nodes, maintain a list of <em>active</em> peers</li>
+<li>Perform consensus with peer nodes (lying if instructed to do so)</li>
+<li>Expose node status and controls via either:
+<ul>
+<li>A TCP connection that can host many clients for a CLI <em>or</em></li>
+<li>A webserver that can handle multiple clients</li>
+</ul>
+</li>
+<li>Cleanly exit all sockets on exit of the server</li>
+</ul>
+<p>Your program must be able to be run in two ways:</p>
+<pre><code class="language-sh">./myNode
+</code></pre>
+<p>Which will choose an OS-assigned port for the peer network</p>
+<p><strong>and</strong></p>
+<pre><code class="language-sh">./myNode 16000
+</code></pre>
+<p>Which will set the peer network port to 16000. This will be used for testing your program. Your node should helpfully print whatever ports it exposes (peer network, cli port, webserver port) so the graders can interact with it properly.</p>
+<h2 id="permitted-libraries">Permitted Libraries</h2>
+<p>These are the libraries I used to complete the assignment. If you want to use a library that is not on this list, ask in the discussion forum.</p>
+<pre><code class="language-python"><span class="hljs-keyword">import</span> argparse
+<span class="hljs-keyword">import</span> json
+<span class="hljs-keyword">import</span> logging
+<span class="hljs-keyword">import</span> math
+<span class="hljs-keyword">import</span> random    <span class="hljs-comment"># unique ID stuff (but a bad one), or load balancing</span>
+<span class="hljs-keyword">import</span> select
+<span class="hljs-keyword">import</span> socket
+<span class="hljs-keyword">import</span> sys
+<span class="hljs-keyword">import</span> time      <span class="hljs-comment"># for timeouts</span>
+<span class="hljs-keyword">import</span> traceback <span class="hljs-comment"># helpful for debugging! Though you should probably pull this out before you submit</span>
+<span class="hljs-keyword">import</span> uuid      <span class="hljs-comment"># unique ID stuff</span>
+</code></pre>
+<p>You may import other libraries that are not communication-oriented for task like printing, debugging, etc. Do not use <code>sched</code>, or other scheduling libraries. Instead, do it yourself with <code>select</code> and timeouts. Same for <code>asyncio</code>.</p>
+<h3 id="non-python-languages">Non-Python Languages</h3>
+<ul>
+<li><strong>Node.js:</strong> It's all callbacks, and that's fine!</li>
+<li><strong>Go:</strong> It's also callbacks, and that's fine!</li>
+<li><strong>Java:</strong> Same restrictions apply as with previous assignments.</li>
+<li><strong>C++:</strong> ...</li>
+</ul>
+<h2 id="hand-in">Hand in</h2>
+<p>Include a <code>README.md</code> in your submission describing how to use your program(s), and detailing any design decisions or interesting characteristics of your submission.</p>
+<p>Use the <code>handin</code> command. If you wrote your own client, explain how to use it.</p>
+<pre><code class="language-sh">handin 3010 fall2025_a3 my_assignment_3_folder
+</code></pre>
+<p>
+<script async="" src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+</p></body></html>
