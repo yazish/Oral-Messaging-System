@@ -1,6 +1,6 @@
 # Oral Messaging System
 
-This repository provides a single Python program `myNode.py` that implements the peer node described in `a3.html`:
+This repository provides a modular Python implementation of the peer node described in `a3.html`:
 
 - UDP gossip mesh for announcing peers and forwarding unique gossip messages while pruning stale entries.
 - Oral Messages (OM) consensus across a five-word distributed "database" with recursive sub-consensus forwarding.
@@ -39,6 +39,17 @@ Connect via `telnet` or `nc` to the printed CLI port. Supported commands:
 - `exit` – close the client connection.
 
 The node automatically removes peers that have been silent for 2 minutes and sends heartbeat gossip every minute.
+
+## Project structure
+
+- `omnode/utils.py` – shared network helpers (hostname resolution and peer key formatting).
+- `omnode/config.py` – well-known peer configuration.
+- `omnode/consensus_state.py` – data structure for tracking OM consensus trees.
+- `omnode/consensus.py` – consensus engine for starting, propagating, and resolving OM rounds.
+- `omnode/gossip.py` – gossip engine for peer discovery and reply handling.
+- `omnode/cli.py` – CLI command parser and dispatcher.
+- `omnode/node.py` – orchestration of sockets, gossip, consensus, and CLI loops.
+- `myNode.py` – entrypoint that wires everything together and starts the node.
 
 ## Notes
 
