@@ -50,8 +50,11 @@ class GossipEngine:
         gid = msg.get("id", "")
         seen = self.mark_gossip_seen(gid)
         peer_name = msg.get("name")
-        existing = peer_key(addr[0], addr[1]) in self.node.peers
-        self.node.add_peer(addr[0], addr[1], name=peer_name)
+        host = msg.get("host", addr[0])
+        port = int(msg.get("port", addr[1]))
+        key = peer_key(host, port)
+        existing = key in self.node.peers
+        self.node.add_peer(host, port, name=peer_name)
         if not seen:
             self.forward_gossip(msg, addr)
         if not existing or msg.get("command") == "GOSSIP":
@@ -62,7 +65,7 @@ class GossipEngine:
             "command": "GOSSIP_REPLY",
             "host": self.node.peer_host,
             "port": self.node.peer_port,
-            "name": self.node.peer_name if name is None else name,
+            "name": self.node.peer_name,
             "cliPort": self.node.cli_port,
             "id": str(uuid.uuid4()),
         }

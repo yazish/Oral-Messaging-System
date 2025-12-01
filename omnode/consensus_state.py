@@ -11,6 +11,7 @@ class ConsensusState:
         self.peers: List[str] = msg.get("peers", [])
         self.index: int = int(msg.get("index", 0))
         self.value: str = msg.get("value", "")
+        self.default_value: str = msg.get("default_value", self.value)
         self.parentid: Optional[str] = msg.get("parentid")
         self.reporter: Optional[str] = msg.get("reporter")
         self.reports: Dict[str, str] = {}
@@ -35,5 +36,8 @@ class ConsensusState:
         counts = Counter(self.reports.values())
         best_count = max(counts.values())
         winners = [v for v, c in counts.items() if c == best_count]
-        self.resolved = sorted(winners)[0]
+        if self.default_value in winners:
+            self.resolved = self.default_value
+        else:
+            self.resolved = sorted(winners)[0]
         return self.resolved

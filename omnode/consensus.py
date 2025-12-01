@@ -19,8 +19,7 @@ class ConsensusEngine:
         if not self.node.lie_mode:
             return honest_value
         if random.random() <= self.node.lie_rate:
-            alt = random.choice(["alpha", "bravo", "charlie", "delta", "echo"])
-            return alt
+            return "faulty_attack"
         return honest_value
 
     # Consensus state helpers ----------------------------------------
@@ -63,6 +62,7 @@ class ConsensusEngine:
         if not peers:
             return
         new_id = str(uuid.uuid4())
+        self_value = self.choose_value(received_value)
         sub_msg = {
             "command": "CONSENSUS",
             "id": new_id,
@@ -70,18 +70,22 @@ class ConsensusEngine:
             "initiator": parent.initiator,
             "peers": peers,
             "index": parent.index,
-            "value": self.choose_value(received_value),
+            "value": self_value,
             "parentid": parent.id,
             "reporter": sender_key,
+            "default_value": parent.default_value,
         }
         self.consensus_map[new_id] = ConsensusState(sub_msg)
         for peer in peers:
             host, port = peer.split(":")
+            peer_value = self.choose_value(received_value)
+            peer_msg = dict(sub_msg)
+            peer_msg["value"] = peer_value
             try:
-                self.node.udp_socket.sendto(json.dumps(sub_msg).encode(), (resolve_host(host), int(port)))
+                self.node.udp_socket.sendto(json.dumps(peer_msg).encode(), (resolve_host(host), int(port)))
             except OSError:
                 continue
-        self.propagate_result_upwards(parent.id, peer_key(self.node.peer_host, self.node.peer_port), sub_msg["value"])
+        self.propagate_result_upwards(parent.id, peer_key(self.node.peer_host, self.node.peer_port), self_value)
 
     def handle_consensus(self, msg: dict, addr: Tuple[str, int]):
         sender = peer_key(addr[0], addr[1])
@@ -102,7 +106,7 @@ class ConsensusEngine:
             return
         m = math.floor((peer_count - 1) / 3)
         cid = str(uuid.uuid4())
-        value_to_send = self.choose_value(value)
+        self_value = self.choose_value(value)
         msg = {
             "command": "CONSENSUS",
             "id": cid,
@@ -110,28 +114,32 @@ class ConsensusEngine:
             "initiator": peer_key(self.node.peer_host, self.node.peer_port),
             "peers": peers,
             "index": index,
-            "value": value_to_send,
+            "value": self_value,
             "parentid": None,
+            "default_value": value,
         }
         state = ConsensusState(msg)
         self.consensus_map[cid] = state
         if 0 <= index < len(self.node.word_list):
-            self.node.word_list[index] = value_to_send
-        state.record_report(peer_key(self.node.peer_host, self.node.peer_port), value_to_send)
-        payload = json.dumps(msg).encode()
+            self.node.word_list[index] = self_value
+        self_key = peer_key(self.node.peer_host, self.node.peer_port)
+        state.record_report(self_key, self_value)
         for peer in peers:
-            if peer == peer_key(self.node.peer_host, self.node.peer_port):
+            if peer == self_key:
                 continue
             host, port = peer.split(":")
+            peer_value = self.choose_value(value)
+            peer_msg = dict(msg)
+            peer_msg["value"] = peer_value
             try:
-                self.node.udp_socket.sendto(payload, (resolve_host(host), int(port)))
+                self.node.udp_socket.sendto(json.dumps(peer_msg).encode(), (resolve_host(host), int(port)))
             except OSError:
                 continue
         logging.info(
             "Started consensus %s at index %d with value '%s' and m=%d",
             cid,
             index,
-            value_to_send,
+            self_value,
             m,
         )
 

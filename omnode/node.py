@@ -11,7 +11,7 @@ from .cli import CliHandler
 from .config import WELL_KNOWN_PEERS
 from .consensus import ConsensusEngine
 from .gossip import GossipEngine
-from .utils import peer_key
+from .utils import peer_key, resolve_host
 
 
 class PeerNode:
@@ -24,7 +24,7 @@ class PeerNode:
             self.peer_host = socket.gethostbyname(socket.gethostname())
         except socket.gaierror:
             self.peer_host = "127.0.0.1"
-        self.peer_name = socket.gethostname()
+        self.peer_name = "Nakamichi Dragon"
 
         self.cli_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.cli_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -51,9 +51,10 @@ class PeerNode:
 
     # Peer helpers ---------------------------------------------------
     def add_peer(self, host: str, port: int, name: Optional[str] = None):
-        key = peer_key(host, port)
+        resolved_host = resolve_host(host)
+        key = peer_key(resolved_host, port)
         if key not in self.peers:
-            self.peers[key] = {"host": host, "port": port, "name": name or key, "last_seen": time.time()}
+            self.peers[key] = {"host": resolved_host, "port": port, "name": name or key, "last_seen": time.time()}
             logging.info("Added peer %s", key)
         else:
             self.peers[key]["last_seen"] = time.time()
